@@ -50,3 +50,19 @@
   bottom:15px;
   right:0px;
 }
+.highlightTextarea-mark {
+  background-color: #ffff00;
+}
+#highlightTextarea-scroll-test {
+  width:50px !important;
+  height:50px !important;
+  overflow:auto !important;
+}
+#highlightTextarea-convert {
+    font-size:1em;
+    margin:0;
+    padding:0;
+    height:auto;
+    line-height:1;
+    border:0;
+}

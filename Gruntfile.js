@@ -6,7 +6,8 @@ module.exports = function(grunt) {
             '/*!\n'+
             ' * jQuery highlightTextarea <%= pkg.version %>\n'+
             ' * Copyright 2014-<%= grunt.template.today("yyyy") %> Damien "Mistic" Sorel (http://www.strangeplanet.fr)\n'+
-            ' * Licensed under MIT (http://opensource.org/licenses/MIT)\n'+
+            ' * Modified to pass Content-Security-Policy https://github.com/vihtinsky/jquery-highlighttextarea \n' +
+            ' * Licensed under MIT (http://opensource.org/licenses/MIT)\n'+ 
             ' */',
 
         // compress js

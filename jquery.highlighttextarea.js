@@ -52,7 +52,7 @@
     Highlighter.DEFAULTS = {
         words: {},
         ranges: {},
-        color: '#ffff00',
+        css_class: 'highlightTextarea-mark',
         caseSensitive: true,
         wordsOnly: false,
         resizable: false,
@@ -69,13 +69,13 @@
     Highlighter.prototype.highlight = function() {
         var text = this.$el.val(),
             that = this;
-        	that.spacer = '';
-        	if (this.settings.wordsOnly ) {
-        		that.spacer = '\\b';
-        	}
+            that.spacer = '';
+            if (this.settings.wordsOnly ) {
+                that.spacer = '\\b';
+            }
 
         var matches = [];
-        $.each(this.settings.words, function(color, words) {
+        $.each(this.settings.words, function(css_class, words) {
           var regex = new RegExp(that.spacer+'('+ words.join('|') +')'+that.spacer, that.regParam);
           var wordMatches = text.match(regex);
           if (wordMatches) {
@@ -83,7 +83,7 @@
             $.each(wordMatches, function(index, match) {
               matches.push(match);
               if (evaluated.indexOf(match) === -1) {
-                text = text.replace(new RegExp(match, 'g'), '<mark style="background-color:'+ color +';">$&</mark>', 'g');
+                text = text.replace(new RegExp(match, 'g'), '<mark class="'+css_class+'">$&</mark>', 'g');
                 evaluated.push(match);
               }
             });
@@ -93,14 +93,12 @@
         $.each(this.settings.ranges, function(i, range) {
             if (range.start < text.length) {
                 text = Utilities.strInsert(text, range.end, '</mark>');
-
-                var mark = '<mark style="background-color:'+ range.color +';"';
+                var css_class = range.css_class;
                 if (range.class != null)
                 {
-                    mark += 'class="' + range.class + '"';
+                    css_class += " " + range.class;
                 }
-                mark += ">";
-
+                var mark = '<mark class="'+  +'">';
                 text = Utilities.strInsert(text, range.start, mark);
             }
         });
@@ -179,12 +177,12 @@
         this.regParam = this.settings.caseSensitive ? 'gm' : 'gim';
 
         if (!$.isEmptyObject(this.settings.words)) {
-            this.settings.words = Utilities.cleanWords(this.settings.words, this.settings.color);
+            this.settings.words = Utilities.cleanWords(this.settings.words, this.settings.css_class);
             this.settings.ranges = {};
         }
         else if (!$.isEmptyObject(this.settings.ranges)) {
             this.settings.words = {};
-            this.settings.ranges = Utilities.cleanRanges(this.settings.ranges, this.settings.color);
+            this.settings.ranges = Utilities.cleanRanges(this.settings.ranges, this.settings.css_class);
         }
 
         if (this.settings.debug) {
@@ -372,7 +370,7 @@
      * Get the scrollbar with on this browser
      */
     Utilities.getScrollbarWidth = function() {
-        var parent = $('<div style="width:50px;height:50px;overflow:auto"><div>&nbsp;</div></div>').appendTo('body'),
+        var parent = $('<div id="#highlightTextarea-scroll-test"><div>&nbsp;</div></div>').appendTo('body'),
             child = parent.children(),
             width = child.innerWidth() - child.height(100).innerWidth();
 
@@ -400,7 +398,7 @@
      */
     Utilities.toPx = function(value) {
         if (value != value.replace('em', '')) {
-            var el = $('<div style="font-size:1em;margin:0;padding:0;height:auto;line-height:1;border:0;">&nbsp;</div>').appendTo('body');
+            var el = $('<div id="highlightTextarea-convert">&nbsp;</div>').appendTo('body');
             value = Math.round(parseFloat(value.replace('em', '')) * el.height());
             el.remove();
             return value;
@@ -480,10 +478,10 @@
     /*
      * Formats a list of words into a hash of arrays (Color => Words list)
      * @param words {mixed}
-     * @param color {string} default color
+     * @param css_class {string} default css_class
      * @return {object[]}
      */
-    Utilities.cleanWords = function(words, color) {
+    Utilities.cleanWords = function(words, css_class) {
         var out = {};
 
         if (!$.isArray(words)) {
@@ -495,37 +493,37 @@
 
             if ($.isPlainObject(group)) {
 
-                if (!out[group.color]) {
-                    out[group.color] = [];
+                if (!out[group.css_class]) {
+                    out[group.css_class] = [];
                 }
                 if (!$.isArray(group.words)) {
                     group.words = [group.words];
                 }
 
                 for (var j=0, m=group.words.length; j<m; j++) {
-                    out[group.color].push(Utilities.htmlEntities(group.words[j]));
+                    out[group.css_class].push(Utilities.htmlEntities(group.words[j]));
                 }
             }
             else {
-                if (!out[color]) {
-                    out[color] = [];
+                if (!out[css_class]) {
+                    out[css_class] = [];
                 }
 
-                out[color].push(Utilities.htmlEntities(group));
+                out[css_class].push(Utilities.htmlEntities(group));
             }
         }
 
         return out;
     };
 
-    
+
     /*
-     * Formats a list of ranges into a hash of arrays (Color => Ranges list)
+     * Formats a list of ranges into a hash of arrays (Css Class => Ranges list)
      * @param ranges {mixed}
-     * @param color {string} default color
+     * @param css_class {string} default css class
      * @return {object[]}
      */
-    Utilities.cleanRanges = function(ranges, color) {
+    Utilities.cleanRanges = function(ranges, css_class) {
         var out = [];
 
         if ($.isPlainObject(ranges) || isNumeric(ranges[0])) {
@@ -537,7 +535,7 @@
 
             if ($.isArray(range)) {
                 out.push({
-                    color: color,
+                    css_class: css_class,
                     start: range[0],
                     end: range[1]
                 });
@@ -551,7 +549,7 @@
                     for (var j=0, m=range.ranges.length; j<m; j++) {
                         if ($.isArray(range.ranges[j])) {
                             out.push({
-                                color: range.color,
+                                css_class: range.css_class,
                                 class: range.class,
                                 start: range.ranges[j][0],
                                 end: range.ranges[j][1]
