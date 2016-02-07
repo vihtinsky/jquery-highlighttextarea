@@ -12,3 +12,6 @@ http://garysieling.github.io/jquery-highlighttextarea/
 3.1.3: Support text ranges with HTML entities
 
 3.1.2: Added tests for jQuery versions & verify on jQuery 1.5+
+
+## About fork
+This fork removes inline styles to pass Content-Security-Policy.
